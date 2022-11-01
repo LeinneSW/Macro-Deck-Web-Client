@@ -19,13 +19,15 @@ var apiVersion = 20;
 var version = "2.5.1";
 
 let batterySocket = null;
-navigator.getBattery().then((battery) => {
-	battery.addEventListener('levelchange', function() {
-		if(batterySocket != null && batterySocket.readyState == 1){
-			batterySocket.send(Math.floor(battery.level * 100) + "");
-		}
-  })
-});
+if(navigator.getBattery !== undefined){
+	navigator.getBattery().then((battery) => {
+		battery.addEventListener('levelchange', function() {
+			if(batterySocket != null && batterySocket.readyState == 1){
+				batterySocket.send(Math.floor(battery.level * 100) + "");
+			}
+	  })
+	});
+}
 
 function back() {
 	disconnect();
@@ -170,10 +172,6 @@ function connect(url) {
 
 	websocket = new WebSocket(url);
 	batterySocket = new WebSocket(`ws:${url.split(":")[1].substring(2)}:7787/`);
-
-	navigator.getBattery().then((battery) => {
-		batterySocket.send(Math.floor(battery.level * 100) + "");
-	});
 
 	websocket.onopen = function (e) {
 		connected = true;
