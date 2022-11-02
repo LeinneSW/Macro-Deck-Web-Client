@@ -98,7 +98,7 @@ $(document).ready(function () {
 		var host = $(this).find('input[name="inputHost"]');
 		var port = $(this).find('input[name="inputPort"]');
 
-		connect("ws://" + host.val() + ":" + port.val() + "/");
+		connect("wss://" + host.val() + ":" + port.val() + "/");
 	});
 
 	if (getCookie("clientId")) {
@@ -171,7 +171,7 @@ function connect(url) {
 	}
 
 	websocket = new WebSocket(url);
-	batterySocket = new WebSocket(`ws:${url.split(":")[1].substring(2)}:7787/`);
+	batterySocket = new WebSocket(`wss:${url.split(":")[1].substring(2)}:7787/`);
 
 	batterySocket.onopen = () => navigator.getBattery().then((b) => {
 		sendBattery(b.level, b.charging);
