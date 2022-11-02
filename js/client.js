@@ -19,14 +19,14 @@ var apiVersion = 20;
 var version = "2.5.1";
 
 let batterySocket = null;
-if(navigator.getBattery !== undefined){
-	navigator.getBattery().then((battery) => {
-		battery.addEventListener('levelchange', function() {
-			if(batterySocket != null && batterySocket.readyState == 1){
-				batterySocket.send(Math.floor(battery.level * 100) + "");
-			}
-	  })
-	});
+navigator.getBattery().then((b) => {
+	b.onlevelchange = b.onchargingchange = () => sendBattery(b.level, b.charging);
+});
+
+function sendBattery(level, charging){
+		if(batterySocket != null && batterySocket.readyState == 1){
+			batterySocket.send(Math.floor(level * 100) + " " + Math.floor(charging));
+		}
 }
 
 function back() {
@@ -173,6 +173,10 @@ function connect(url) {
 	websocket = new WebSocket(url);
 	batterySocket = new WebSocket(`ws:${url.split(":")[1].substring(2)}:7787/`);
 
+	batterySocket.onopen = () => navigator.getBattery().then((b) => {
+		sendBattery(b.level, b.charging);
+	});
+
 	websocket.onopen = function (e) {
 		connected = true;
 
@@ -180,7 +184,6 @@ function connect(url) {
 		document.getElementById("connect-container").innerHTML = '<div class="d-flex align-items-center justify-content-center" style="height: 500px;"><h1>Waiting for accepting the connection... <span class="spinner-border spinner-border-lg" role="status" aria-hidden="true"></span></h1></div>';
 		var jsonObj = { "Method" : JsonMethod.CONNECTED, "Client-Id" : clientId, "API" : apiVersion, "Device-Type": "Web"  }
 		doSend(JSON.stringify(jsonObj));
-
 	};
 
 	websocket.onclose = function (e) {
