@@ -24,9 +24,9 @@ navigator.getBattery().then((b) => {
 });
 
 function sendBattery(level, charging){
-		if(batterySocket != null && batterySocket.readyState == 1){
-			batterySocket.send(Math.floor(level * 100) + " " + Math.floor(charging));
-		}
+	if(batterySocket != null && batterySocket.readyState == 1){
+		batterySocket.send(Math.floor(level * 100) + " " + Math.floor(charging));
+	}
 }
 
 function back() {
